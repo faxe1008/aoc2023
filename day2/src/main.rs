@@ -112,6 +112,32 @@ fn riddle_part_one(file_path: &String) {
 }
 
 fn riddle_part_two(file_path: &String) {
+    let text = fs::read_to_string(file_path).expect("Error reading file");
+    let lines : Vec<&str> = text.split('\n').collect();
+
+    let mut cube_power_sum = 0;
+
+    for line in lines {
+        let game = Game::from_string(line).expect("Error parsing game");
+
+        let mut min_count_per_cube_color : HashMap<CubeColor, usize> = HashMap::new();
+
+        for draw in game.cube_draws {
+            for (cube_color, cube_count) in draw.cubes {
+               if cube_count > *min_count_per_cube_color.get(&cube_color).unwrap_or(&0) {
+                    min_count_per_cube_color.insert(cube_color, cube_count);
+               }
+            }
+        }
+
+        let mut cube_power = 1;
+        for (cube_color, cube_count) in min_count_per_cube_color {
+            cube_power *= cube_count;
+        }
+        cube_power_sum += cube_power;
+    }
+
+    println!("Cube power sum: {:?}", cube_power_sum);
 
 }
 
