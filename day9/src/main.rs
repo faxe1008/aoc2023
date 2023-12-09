@@ -36,6 +36,43 @@ fn get_prediction_for_time_row(time_row: &Vec<isize>) -> isize {
 }
 
 
+fn get_predessor_for_time_row(time_row: &Vec<isize>) -> isize {
+
+    let mut time_row_diffs : Vec<Vec<isize>> = vec![time_row.clone()];
+
+
+    loop {
+
+        let cur_pos = time_row_diffs.last().unwrap();
+
+        if cur_pos.iter().all(|&y| y == 0) {
+            break;
+        }
+
+        let mut acc_vec : Vec<isize> = Vec::new();
+        for i in 0..cur_pos.len()-1 {
+            acc_vec.push(cur_pos[i+1] - cur_pos[i]);
+        }
+        time_row_diffs.push(acc_vec);
+    }
+
+    let mut value = time_row_diffs[0][0];
+    let mut is_sub = true;
+
+    for v in time_row_diffs.iter().skip(1) {
+
+        if is_sub {
+            value -= v.first().unwrap();
+        } else {
+            value += v.first().unwrap();
+        }
+
+        is_sub = !is_sub;
+    }
+
+    value
+}
+
 
 fn riddle_part_one(file_path: &String) {
     let text = fs::read_to_string(file_path).expect("Error reading file");
@@ -50,6 +87,9 @@ fn riddle_part_one(file_path: &String) {
 fn riddle_part_two(file_path: &String) {
     let text = fs::read_to_string(file_path).expect("Error reading file");
 
+    let time_rows  = get_time_rows(&text);
+    let sum : isize = time_rows.iter().map(|row| get_predessor_for_time_row(&row)).sum();
+    dbg!(sum);
 }
 
 fn main() {
